@@ -1,7 +1,9 @@
 AGM
 ===
 
-Awesome Games Menu written in python 
+Awesome Games Menu written in python (Work in progress)
+
+Does not do much yet part from display a fake menu.
 
 Created by using Netbeans 7.3.1 and python plugin.
 
