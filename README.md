@@ -5,9 +5,12 @@ Awesome Games Menu written in python
 
 Created by using Netbeans 7.3.1 and python plugin.
 
-Python plugin from add to Tools/Plugins/Settings
-
+Python plugin from 
 http://deadlock.netbeans.org/hudson/job/nbms-and-javadoc/lastStableBuild/artifact/nbbuild/nbms/updates.xml.gz
+
+Add to Tools/Plugins/Settings
+
+
 
 To Run from command line
     python agm.py
