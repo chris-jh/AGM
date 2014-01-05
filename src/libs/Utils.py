@@ -4,6 +4,9 @@ from pygame.locals import *
 default_width = 640
 default_height = 480
 
+def check_file_exists(file):
+    return os.path.exists(file)
+
 #functions to create our resources
 def load_image(name, colorkey=None):
     fullname = os.path.join('', name)

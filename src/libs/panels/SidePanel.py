@@ -7,10 +7,12 @@ from libs.components.Menu import *
 
 
 class SidePanel():
-    def __init__(self, app, parent):
+    def __init__(self, app, parent, current_focus, next_focus):
         self.app = app
         self.app.update_loading("[Main Screen - Side Panel]")
         self.parent = parent
+        self.current_focus = current_focus
+        self.next_focus = next_focus
         self.size = (calc_w(128), self.app.get_height());
         self.title1_text = "Awesome Games"
         self.title2_text = "Menu"
@@ -37,9 +39,20 @@ class SidePanel():
         names.append("Quit")
         self.menu = Menu(self.app, self, (calc_w(5), calc_h(80)), (calc_w(118), calc_h(20)), names, self.app.theme.side_panel_menu_f_colour, self.app.theme.side_panel_menu_selector_colour)
     
+    def update_selected(self):
+        self.parent.get_recent_panel().display_platform(self.menu.get_selected_menu())
+        
+    def focus(self):
+        return
+        
+    def unfocus(self):
+        return
+
     def check_events(self, event):
         self.menu.check_events(event)
-    
+        if event.type == KEYDOWN and event.key == K_RIGHT:
+            self.parent.set_focus(self.next_focus)
+        
     def update(self):
         self.title_sprites.update()
         self.menu.update()

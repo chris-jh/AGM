@@ -1,11 +1,11 @@
 import os
 import pygame
-import sqlite3
 from pygame.locals import *
 from libs.components.SideBar import *
 from libs.misc.configobj import ConfigObj
 from libs.screens.MainScreen import *
 from libs.themes.DefaultTheme import *
+from libs.db.DB import *
 
 class App():
     def __init__(self, config_file="config.ini"):
@@ -15,6 +15,7 @@ class App():
         self._init_display()
         self._init_theme()
         self._init_background()
+        self._init_db()
         self._init_screens()
         self._init_misc()
         self._run()
@@ -64,6 +65,9 @@ class App():
         self.display.blit(self.background, (0, 0))
         
         pygame.display.flip()
+    
+    def _init_db(self):
+        self.db = DB(self)
 
     def _init_screens(self):
         self.main_screen = MainScreen(self)

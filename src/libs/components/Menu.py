@@ -66,6 +66,12 @@ class Menu():
     	if (self.selected >= len(self.list)):
             self.selected = len(self.list) - 1
     	self.selector.move_menu(self.selected)
+    
+    def get_selected(self):
+        return self.selected
+    
+    def get_selected_menu(self):
+        return self.list[self.get_selected()]
 
 
 class MenuSelector(pygame.sprite.Sprite):
@@ -116,6 +122,7 @@ class MenuSelector(pygame.sprite.Sprite):
             else:
                 self.movement = self.next_rect
                 self.move_up = False
+                self.parent.parent.update_selected()
             self.rect = self.movement
             self.app.update()
     	elif (self.move_down):
@@ -125,6 +132,7 @@ class MenuSelector(pygame.sprite.Sprite):
             else:
                 self.movement = self.next_rect
                 self.move_down = False
+                self.parent.parent.update_selected()
             self.rect = self.movement
             self.app.update()
         
