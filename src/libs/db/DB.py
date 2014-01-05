@@ -22,7 +22,6 @@ class DB():
         #self._show_data()
     
     def _init_db(self):
-        print "INIT DATABASE"
         self.app.update_loading("[INIT DATABASE]")
         c = self.connection.cursor()
         c.executescript("""
@@ -105,7 +104,7 @@ class DB():
                 msql2 = "%s offset %s" % (msql, offset)
                 msql = msql2
         
-        print "PROCESS SQL: %s | [%s]" % (msql, str(params))
+        #print "PROCESS SQL: %s | [%s]" % (msql, str(params))
         
         try:
             return c.execute(msql, params).fetchall()
@@ -113,32 +112,26 @@ class DB():
             print "ERROR: %s" % e
             return None
     
-    def find_platform_games(self, platform, offset=None, limit=None):
+    def find_games_by_platform(self, platform, offset=None, limit=None):
         try:
-            print "Fetch games for platform: %s" % platform
             row =  self.process_sql(DB.FIND_PLATFORM_BY_NAME, (platform,), 0, 1)
             if (row):
-                print "PLATFORM ID: %s" % str(row[0][0])
                 return self.process_sql(DB.FIND_ALL_GAMES_BY_PLATFORM, (str(row[0][0]),), offset, limit)
         except sqlite3.Error as e:
             return None
     
     def find_recently_played_games_by_platform(self, platform, offset=None, limit=None):
         try:
-            print "Fetch games for platform: %s" % platform
             row =  self.process_sql(DB.FIND_PLATFORM_BY_NAME, (platform,), 0, 1)
             if (row):
-                print "PLATFORM ID: %s" % str(row[0][0])
                 return self.process_sql(DB.FIND_RECENTLY_PLAYED_GAMES_BY_PLATFORM, (str(row[0][0]),), offset, limit)
         except sqlite3.Error as e:
             return None
     
     def find_recently_added_games_by_platform(self, platform, offset=None, limit=None):
         try:
-            print "Fetch games for platform: %s" % platform
             row =  self.process_sql(DB.FIND_PLATFORM_BY_NAME, (platform,), 0, 1)
             if (row):
-                print "PLATFORM ID: %s" % str(row[0][0])
                 return self.process_sql(DB.FIND_RECENTLY_ADDED_GAMES_BY_PLATFORM, (str(row[0][0]),), offset, limit)
         except sqlite3.Error as e:
             return None

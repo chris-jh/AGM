@@ -21,7 +21,8 @@ class App():
         self._run()
         
     def _init_config(self):
-        pygame.init()        
+        pygame.init()   
+        #self._show_modes()
         self.config = ConfigObj(self.config_file)
         self.overide_resolution = self.config["display"].as_bool("overide_resolution")
         if (self.overide_resolution):
@@ -112,3 +113,18 @@ class App():
     
     def get_height(self):
         return self.display_size[1]
+    
+    def get_screen(self):
+        return self.screen
+    
+    def get_display(self):
+        return self.display
+    
+    def update_display(self):
+        pygame.display.update()
+    
+    def _show_modes(self):
+        modes = pygame.display.list_modes(16, pygame.FULLSCREEN)
+        print "SHOWING MODES"
+        print "MODES: %s " % (str(modes))
+        print "SHOWING MODES DONE"

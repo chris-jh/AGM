@@ -148,7 +148,6 @@ class RecentScrollPanel():
         print "GO GO GO GO"
     
     def move_scroll_items(self, value):
-        print "MOVE"
         self.highlight_selected(True)
         self.app.update()
     

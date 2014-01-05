@@ -124,7 +124,7 @@ class MenuSelector(pygame.sprite.Sprite):
                 self.move_up = False
                 self.parent.parent.update_selected()
             self.rect = self.movement
-            self.app.update()
+            self.update_app()
     	elif (self.move_down):
             self.current_rect = self.rect.copy()
             if (self.current_rect.y < self.next_rect.y):
@@ -134,8 +134,7 @@ class MenuSelector(pygame.sprite.Sprite):
                 self.move_down = False
                 self.parent.parent.update_selected()
             self.rect = self.movement
-            self.app.update()
-        
+            self.update_app()
     
-        
-        
+    def update_app(self):
+        self.app.update()

@@ -41,7 +41,7 @@ class SidePanel():
     
     def update_selected(self):
         self.parent.get_recent_panel().display_platform(self.menu.get_selected_menu())
-        
+    
     def focus(self):
         return
         
@@ -64,7 +64,7 @@ class SidePanel():
         self.title_sprites.draw(surface)
         
         self.menu.draw(surface)
-    
-    
+        
+        
         
         
