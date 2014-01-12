@@ -6,7 +6,7 @@ from libs.components.Label import *
 
 
 class Menu():
-    def __init__(self, app, parent, position, size, list, colour=(0,0,0), selector_colour=(255,255,255,255)):
+    def __init__(self, app, parent, position, size, list, colour=(0,0,0), selector_colour=(255,255,255,255), main_back_colour=None):
         self.app = app
         self.parent = parent
         self.position = position
@@ -14,6 +14,7 @@ class Menu():
         self.list = list
         self.colour = colour
         self.selector_colour = selector_colour
+        self.main_back_colour = main_back_colour
         self.selected = 0
         self._init_list()
         self._init_selector()
@@ -30,7 +31,7 @@ class Menu():
     	return (self.position[1] + (self.size[1] * index))
     
     def _init_selector(self):
-        self.selector = MenuSelector(self.app, self, self.position, self.size, self.selector_colour)
+        self.selector = MenuSelector(self.app, self, self.position, self.size, self.selector_colour, self.main_back_colour)
         self.selector_sprites = pygame.sprite.RenderPlain((self.selector))
     
     def draw(self, surface):
@@ -72,18 +73,32 @@ class Menu():
     
     def get_selected_menu(self):
         return self.list[self.get_selected()]
+    
+    def focus(self):
+        self.selector.focus()
+        
+    def unfocus(self):
+        self.selector.unfocus()
 
 
 class MenuSelector(pygame.sprite.Sprite):
-    def __init__(self, app, parent, pos, size, colour):
+    def __init__(self, app, parent, pos, size, colour, main_back_colour):
     	pygame.sprite.Sprite.__init__(self)
         self.app = app
         self.parent = parent
         self.pos = pos;
     	self.size = size;
-        self.br = 100
-        self.colour = colour
-        self.colour_out = (self.colour[0]+self.br, self.colour[1]+self.br, self.colour[2]+self.br, self.colour[3])
+        self.br = 20
+        self.br2 = 50
+        self.main_back_colour = main_back_colour
+        self.main_colour = colour
+        self.colour = adjust_c(self.main_colour, self.br)
+        print "C: %s %s %s %s" % (self.colour[0],self.colour[1],self.colour[2],self.colour[3])
+        self.colour_out = adjust_c(self.colour, self.br2)
+        
+        self.colour_fade = adjust_c(self.main_colour, 0)
+        self.colour_out_fade = adjust_c(self.colour_fade, self.br2)
+
         self.move_up = False
     	self.move_down = False
     	self.move_pos = [0,0]
@@ -99,7 +114,9 @@ class MenuSelector(pygame.sprite.Sprite):
         self.r = calc_w(10)
         self.menu_bar_width = (self.size[0] - self.r)
         self.menu_bar_left = (self.r) / 2
-        self.menu_bar = pygame.Surface(self.size,pygame.SRCALPHA);
+        self.menu_bar = pygame.Surface(self.size,pygame.SRCALPHA)
+        if (self.main_back_colour):
+            self.menu_bar.fill(self.main_back_colour)
         self.menu_bar.blit(gradients.horizontal((self.menu_bar_width / 2, self.size[1]), self.colour, self.colour_out), (self.menu_bar_left, 0))
         self.menu_bar.blit(gradients.horizontal((self.menu_bar_width / 2, self.size[1]), self.colour_out, self.colour), (self.menu_bar_left + (self.menu_bar_width / 2), 0))
         self.image.blit(self.menu_bar, (0,0))
@@ -138,3 +155,19 @@ class MenuSelector(pygame.sprite.Sprite):
     
     def update_app(self):
         self.app.update()
+    
+    def focus(self):
+        if (self.main_back_colour):
+            self.menu_bar.fill(self.main_back_colour)
+        self.menu_bar.blit(gradients.horizontal((self.menu_bar_width / 2, self.size[1]), self.colour, self.colour_out), (self.menu_bar_left, 0))
+        self.menu_bar.blit(gradients.horizontal((self.menu_bar_width / 2, self.size[1]), self.colour_out, self.colour), (self.menu_bar_left + (self.menu_bar_width / 2), 0))
+        self.image.blit(self.menu_bar, (0,0))
+        self.update_app()
+        
+    def unfocus(self):
+        if (self.main_back_colour):
+            self.menu_bar.fill(self.main_back_colour)
+        self.menu_bar.blit(gradients.horizontal((self.menu_bar_width / 2, self.size[1]), self.colour_fade, self.colour_out_fade), (self.menu_bar_left, 0))
+        self.menu_bar.blit(gradients.horizontal((self.menu_bar_width / 2, self.size[1]), self.colour_out_fade, self.colour_fade), (self.menu_bar_left + (self.menu_bar_width / 2), 0))
+        self.image.blit(self.menu_bar, (0,0))
+        self.update_app()

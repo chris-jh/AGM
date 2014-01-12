@@ -37,15 +37,17 @@ class SidePanel():
         for x in range(1, num_emus+1):
             names.append(self.app.config["emulator%s" % x]["name"])
         names.append("Quit")
-        self.menu = Menu(self.app, self, (calc_w(5), calc_h(80)), (calc_w(118), calc_h(20)), names, self.app.theme.side_panel_menu_f_colour, self.app.theme.side_panel_menu_selector_colour)
+        self.menu = Menu(self.app, self, (calc_w(5), calc_h(80)), (calc_w(118), calc_h(20)), names, self.app.theme.side_panel_menu_f_colour, self.app.theme.side_panel_menu_selector_colour, self.app.theme.side_panel_b_colour)
     
     def update_selected(self):
         self.parent.get_recent_panel().display_platform(self.menu.get_selected_menu())
     
     def focus(self):
+        self.menu.focus()
         return
         
     def unfocus(self):
+        self.menu.unfocus()
         return
 
     def check_events(self, event):

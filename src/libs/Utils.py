@@ -55,3 +55,29 @@ def calc_w(pixel):
 
 def calc_h(pixel):
     return round(pixel * get_pixel_ratio_h())
+
+def adjust_c(colour, value):
+    c = (255,255,255,255)
+    if ((colour[0]+value) > 255):
+        c = (255, c[1], c[2], c[3])
+    elif ((colour[0]+value) < 0):
+        c = (0, c[1], c[2], c[3])    
+    else:
+        c = (colour[0]+value, c[1], c[2], c[3])
+    
+    if ((colour[1]+value) > 255):
+        c = (c[0], 255, c[2], c[3])
+    elif ((colour[1]+value) < 0):
+        c = (c[0], 0, c[2], c[3])    
+    else:
+        c = (c[0], colour[1]+value, c[2], c[3])
+    
+    if ((colour[2]+value) > 255):
+        c = (c[0], c[1], 255, c[3])
+    elif ((colour[2]+value) < 0):
+        c = (c[0], c[1], 0, c[3])   
+    else:
+        c = (c[0], c[1], colour[2]+value, c[3])
+    
+    c = (c[0], c[1], c[2], colour[3])
+    return c

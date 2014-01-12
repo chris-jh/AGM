@@ -79,11 +79,16 @@ class RecentScrollPanel():
         self.app = app
         self.app.update_loading("[Main Screen - Recent Panel(%s)]" % text)
         self.parent = parent
+        self.orig_position = position
         self.position = position
         self.size = size
         self.text = text
         self.selected = 0
         self.max = 0
+        self.move_left = False
+        self.move_right = False
+        self.scroll_speed = 10
+        self.num_scroll_items = 6
         self._init_background()
         self._init_title()
         self._init_scroll()
@@ -95,12 +100,18 @@ class RecentScrollPanel():
     
     def _init_title(self):
         self.label = Label(self.text, self.position, (self.size[0]-calc_w(5), calc_h(20)), calc_h(18), self.app.theme.recent_panel_f_colour, "RIGHT")
-        self.label_sprites = pygame.sprite.RenderPlain((self.label))
+        self.game_label = Label("[INSERT GAME TITLE]", (self.position[0]+calc_w(5), self.position[1]), (self.size[0]-calc_w(5), calc_h(20)), calc_h(18), self.app.theme.recent_panel_f_colour, "LEFT")
+        self.label_sprites = pygame.sprite.RenderPlain((self.game_label, self.label))
     
     def _init_scroll(self):
         self.test_sprite = pygame.sprite.RenderPlain()
-        self.scroll_item_size = (self.size[0] / 7, self.size[1]-calc_h(25))
-        self.scroll_item_pos = (self.position[0] + calc_w(10), self.position[1]+calc_h(25))
+        self._calc_scroll_pos_size(self.size, self.position)
+    
+    def _calc_scroll_pos_size(self, size=None, position=None):
+        if (size):
+            self.scroll_item_size = (size[0] / self.num_scroll_items, size[1]-calc_h(10))
+        if (position):
+            self.scroll_item_pos = (position[0]+calc_w(5), position[1]+calc_h(22))
         
     def display_platform(self, platform, data):
         self.platform = platform
@@ -112,8 +123,7 @@ class RecentScrollPanel():
         if (self.data):
             self.max = len(self.data)
             for x in range(0, self.max):
-                w = 10
-                pos = (self.scroll_item_pos[0] + ((self.scroll_item_size[0] + calc_w(w)) * x), self.scroll_item_pos[1])
+                pos = (self.scroll_item_pos[0] + (self.scroll_item_size[0] * x), self.scroll_item_pos[1])
                 test = RecentScrollItem(self.app, self, pos, self.scroll_item_size, self.data[x])
                 self.scroll_items.append(test)
                 self.test_sprite.add(test)
@@ -129,20 +139,28 @@ class RecentScrollPanel():
             self.scroll_items[self.selected].selected(value)
             
     def left(self):
-        self.highlight_selected(False)
-        self.selected = self.selected - 1
-    	if (self.selected < 0):
-            self.selected = 0
-            self.parent.change_focus()
-        else:
-            self.move_scroll_items(self.selected)
+        if not (self.move_right or self.move_left):            
+            self.highlight_selected(False)
+            self.selected = self.selected - 1
+            if (self.selected < 0):
+                self.selected = 0
+                self.parent.change_focus()
+                self.move_left = False
+            else:
+                self.m_pos = 0
+                self.move_left = True
+                self.move_scroll_items(self.selected)
     
     def right(self):
-        self.highlight_selected(False)
-        self.selected = self.selected + 1
-    	if (self.selected >= self.max):
-            self.selected = self.max-1
-        self.move_scroll_items(self.selected)
+        if not (self.move_right or self.move_left):            
+            self.highlight_selected(False)
+            self.selected = self.selected + 1
+            if (self.selected >= self.max):
+                self.selected = self.max-1
+            else :
+                self.m_pos = 0
+                self.move_right = True
+                self.move_scroll_items(self.selected)
 
     def process_selected(self):
         print "GO GO GO GO"
@@ -164,7 +182,31 @@ class RecentScrollPanel():
     def update(self):
         self.label_sprites.update()
         self.test_sprite.update()
-
+        if (self.move_right):
+            pos = (-(calc_w(self.scroll_speed)), 0)            
+            self.m_pos = self.m_pos + pos[0]
+            if (self.m_pos <= -(self.scroll_item_size[0])):
+                self.move_right = False
+                pos = (pos[0] - (self.m_pos - -self.scroll_item_size[0]), 0)
+                
+            for x in range(0, self.max):
+                self.scroll_items[x].update_position(pos)
+                self.update_app()
+        
+        if (self.move_left):
+            pos = ((calc_w(self.scroll_speed)), 0)            
+            self.m_pos = self.m_pos + pos[0]
+            if (self.m_pos >= (self.scroll_item_size[0])):
+                self.move_left = False
+                pos = (pos[0] + (self.scroll_item_size[0] - self.m_pos), 0)
+                
+            for x in range(0, self.max):
+                self.scroll_items[x].update_position(pos)
+                self.update_app()
+    
+    def update_app(self):
+        self.app.update()
+    
     def draw(self, surface):
         surface.blit(self.background, self.position)
         self.label_sprites.draw(surface)
@@ -179,9 +221,11 @@ class RecentScrollItem(pygame.sprite.Sprite):
         self.position = position
         self.size = size
         self.data = data
-        self.margin=10
-        self.shadow_margin=2
-        self.image_size = (size[0]+calc_w(self.shadow_margin), size[1]+calc_h(self.shadow_margin))
+        self.margin=6
+        self.shadow_margin=5
+        self.main_margin=25
+        self.main_size = (size[0]-calc_w(self.main_margin/2), size[1]-calc_h(self.main_margin/2))
+        self.image_size = (self.main_size[0]+calc_w(self.shadow_margin), self.main_size[1]+calc_h(self.shadow_margin))
         self.image = pygame.Surface(self.image_size, pygame.SRCALPHA)
         self._init_background()
         self._init_image()
@@ -191,16 +235,16 @@ class RecentScrollItem(pygame.sprite.Sprite):
     
     def _init_background(self):
         self.background_pos = (calc_w(self.margin/2), calc_h(self.margin/2));
-        self.background = pygame.Surface(self.size, pygame.SRCALPHA)
+        self.background = pygame.Surface(self.main_size, pygame.SRCALPHA)
     	self.background.convert()
     	self.background.fill(self.app.theme.recent_panel_b_colour)
         self.background_shadow_pos = (calc_w(self.shadow_margin), calc_h(self.shadow_margin))
-        self.background_shadow = pygame.Surface(self.size, pygame.SRCALPHA)
+        self.background_shadow = pygame.Surface(self.main_size, pygame.SRCALPHA)
     	self.background_shadow.convert()
     	self.background_shadow.fill((0,0,0,50))
         
     def _init_image(self):
-        self.background_image_size = (self.size[0]-calc_w(self.margin), self.size[1]-calc_h(self.margin));
+        self.background_image_size = (self.main_size[0]-calc_w(self.margin), self.main_size[1]-calc_h(self.margin));
         self.background_image = pygame.Surface(self.background_image_size, pygame.SRCALPHA)
     	self.background_image.convert()
     	self.background_image.fill((100,100,100,0))
@@ -212,7 +256,7 @@ class RecentScrollItem(pygame.sprite.Sprite):
     def _update(self):
         self.background.blit(self.background_image, self.background_pos)
         self.image.blit(self.background_shadow, self.background_shadow_pos)        
-        self.image.blit(self.background, (0,0))
+        self.image.blit(self.background, self.background_pos)
         
     def selected(self, value):
         if (value):
@@ -220,5 +264,10 @@ class RecentScrollItem(pygame.sprite.Sprite):
         else:
             self.background.fill(self.app.theme.recent_panel_b_colour)
         self._update()
-        
-        
+    
+    def get_size(self):
+        return self.size;
+    
+    def update_position(self, position):
+        self.position = position
+        self.rect = self.rect.move(self.position)        

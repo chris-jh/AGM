@@ -20,6 +20,8 @@ class Label(pygame.sprite.Sprite):
             self.image.blit(self.text_render, self.text_render.get_rect(centerx=self.image.get_width()/2, centery=self.image.get_height()/2))
         elif (self.alignment == "RIGHT"):
             self.image.blit(self.text_render, self.text_render.get_rect(right=self.image.get_width(), centery=self.image.get_height()/2))
+        elif (self.alignment == "LEFT"):
+            self.image.blit(self.text_render, self.text_render.get_rect(centery=self.image.get_height()/2))
         else:
             self.image.blit(self.text_render, (0,0))
 
